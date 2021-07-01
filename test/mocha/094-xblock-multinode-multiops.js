@@ -147,14 +147,16 @@ describe('X Block Test', () => {
      * 7. attempt to retrieve all records added in 1 from the `records` API
      */
 
-    const targetBlockHeight = 50;
+    const targetBlockHeight = 25;
+    const operationCount = 50;
 
-    describe(`${targetBlockHeight} Blocks`, () => {
+    describe(`${targetBlockHeight} Blocks (${operationCount} ops)`, () => {
       it('makes many more blocks', async function() {
         this.timeout(0);
 
         // create N blocks
-        const nBlocks = await _nBlocks({consensusApi, targetBlockHeight});
+        const nBlocks = await _nBlocks(
+          {consensusApi, targetBlockHeight, operationCount});
         console.log('nBlocks output', JSON.stringify(nBlocks, null, 2));
         Object.values(nBlocks.targetBlockHashMap)
           .every(h => h === nBlocks.targetBlockHashMap.alpha).should.be.true;
@@ -199,12 +201,11 @@ describe('X Block Test', () => {
   });
 });
 
-async function _nBlocks({consensusApi, targetBlockHeight}) {
+async function _nBlocks({consensusApi, targetBlockHeight, operationCount}) {
   const recordIds = {alpha: [], beta: [], gamma: [], delta: []};
   const targetBlockHashMap = {};
   while(Object.keys(targetBlockHashMap).length !== Object.keys(nodes).length) {
-    const count = 1;
-    const operations = await _addOperations({count});
+    const operations = await _addOperations({count: operationCount});
     // record the IDs for the records that were just added
     for(const n of ['alpha', 'beta', 'gamma', 'delta']) {
       for(const opHash of Object.keys(operations[n])) {
