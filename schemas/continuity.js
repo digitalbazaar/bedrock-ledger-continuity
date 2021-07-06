@@ -12,10 +12,12 @@ const {schemas} = require('bedrock-validation');
 const mergeEventProof = {
   type: 'object',
   additionalProperties: false,
-  required: ['created', 'jws', 'proofPurpose', 'type', 'verificationMethod'],
+  required: [
+    'created', 'proofValue', 'proofPurpose', 'type', 'verificationMethod'
+  ],
   properties: {
     created: schemas.w3cDateTime(),
-    jws: {
+    proofValue: {
       type: 'string'
     },
     proofPurpose: {
@@ -24,7 +26,7 @@ const mergeEventProof = {
     },
     type: {
       type: 'string',
-      enum: ['Ed25519Signature2018']
+      enum: ['Ed25519Signature2020']
     },
     verificationMethod: {
       type: 'string'
@@ -43,7 +45,10 @@ const continuityMergeEvent = {
   ],
   type: 'object',
   properties: {
-    '@context': schemas.jsonldContext(constants.WEB_LEDGER_CONTEXT_V1_URL),
+    '@context': schemas.jsonldContext([
+      constants.WEB_LEDGER_CONTEXT_V1_URL,
+      constants.ED25519_2020_CONTEXT_V1_URL
+    ]),
     basisBlockHeight: {
       type: 'integer',
       minimum: 0,
@@ -148,7 +153,7 @@ const continuity2017ledgerConfiguration = {
       type: 'string',
       enum: ['Continuity2017'],
     },
-    proof: schemas.linkedDataSignature2018(),
+    proof: schemas.linkedDataSignature2020(),
     sequence: {
       type: 'integer',
       minimum: 1,
@@ -187,7 +192,7 @@ const webLedgerConfigurationEvent = {
       minItems: 1,
       maxItems: 1
     },
-    signature: schemas.linkedDataSignature2018(),
+    signature: schemas.linkedDataSignature2020(),
     treeHash: {
       type: 'string'
     },
