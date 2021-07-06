@@ -240,6 +240,27 @@ api.copyEvents = async ({from, to, useSnapshot = false}) => {
   await to.worker.writePeerEvents();
 };
 
+api.createGetBlockWitnesses = ({peers}) => {
+  return async () => {
+    const witnesses = [];
+
+    // calculate the number of witnesses
+    let numWitnesses = 1;
+    if(peers.values().length > 1) {
+      const f = Math.floor((peers.values().length - 1) / 3);
+      numWitnesses = 3 * f + 1;
+    }
+
+    // build the map of witnesses
+    const witnessPeers = peers.slice(0, numWitnesses);
+    for(const peer of witnessPeers) {
+      witnesses.push(peer.id);
+    }
+
+    return {witnesses};
+  };
+};
+
 api.createEvent = async (
   {eventTemplate, eventNum, consensus = true, hash = true} = {}) => {
   const events = [];
